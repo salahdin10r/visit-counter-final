@@ -1,0 +1,37 @@
+name: Deploy Node.js JSON Counter
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Installer Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # 3. Installer les dépendances
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Créer le zip
+      - name: Zip application
+        run: zip -r app.zip . -x ".git/*" ".github/*"
+
+      # 5. Déployer
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: visit-counter-final-salah   # 🔥 mieux en dur
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: app.zip
